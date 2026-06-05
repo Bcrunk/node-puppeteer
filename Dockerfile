@@ -62,6 +62,12 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install AWS CLI v2 (required by CircleCI aws-cli orb when running as non-root)
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).tar.gz" -o "/tmp/awscliv2.zip" \
+    && unzip -q /tmp/awscliv2.zip -d /tmp \
+    && /tmp/aws/install \
+    && rm -rf /tmp/awscliv2.zip /tmp/aws
+
 # Create common working directories with proper permissions
 # /usr/src/app for general use, /data for CircleCI
 RUN mkdir -p /usr/src/app /data && \
