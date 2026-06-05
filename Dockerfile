@@ -6,8 +6,6 @@ ENV LANG=en_US.UTF-8
 ENV DBUS_SESSION_BUS_ADDRESS=autolaunch:
 
 # Install Chrome dependencies and RegSuit requirements
-# Following Puppeteer official 2026 approach with minimal pre-installed packages
-# Note: Chrome/Puppeteer will install additional deps via --install-deps when needed
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -21,6 +19,10 @@ RUN apt-get update \
     fonts-kacst \
     fonts-freefont-ttf \
     git \
+    unzip \
+    wget \
+    curl \
+    gnupg \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -54,10 +56,16 @@ RUN apt-get update \
     libxrender1 \
     libxss1 \
     libxtst6 \
-    wget \
     xdg-utils \
     zlib1g \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Set up secure working directory for the node user
+WORKDIR /usr/src/app
+RUN chown -R node:node /usr/src/app
+
 USER node
+
+# (Optional) Ensure Puppeteer downloads Chrome to a predictable writeable location
+ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
