@@ -19,6 +19,7 @@ RUN apt-get update \
     fonts-kacst \
     fonts-freefont-ttf \
     git \
+    openssh-client \
     unzip \
     wget \
     curl \
