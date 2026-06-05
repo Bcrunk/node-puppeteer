@@ -62,11 +62,14 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up secure working directory for the node user
-WORKDIR /usr/src/app
-RUN chown -R node:node /usr/src/app
+# Create common working directories with proper permissions
+# /usr/src/app for general use, /data for CircleCI
+RUN mkdir -p /usr/src/app /data && \
+    chown -R node:node /usr/src/app /data
 
 USER node
 
+WORKDIR /usr/src/app
+
 # (Optional) Ensure Puppeteer downloads Chrome to a predictable writeable location
-ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
+ENV PUPPETEER_CACHE_DIR=/home/node/.cache/puppeteer
