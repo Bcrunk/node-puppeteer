@@ -1,29 +1,45 @@
-FROM node:24-slim
+FROM node:24-bookworm-slim
 
-# Install system dependencies required by Puppeteer / Chrome For Testing
-RUN apt-get update -y && apt-get install -yq --no-install-recommends \
+# Configure default locale (important for Chrome headless)
+ENV LANG=en_US.UTF-8
+# Attempts to start a new DBUS session if none is present
+ENV DBUS_SESSION_BUS_ADDRESS=autolaunch:
+
+# Install Chrome dependencies and RegSuit requirements
+# Following Puppeteer official 2026 approach with minimal pre-installed packages
+# Note: Chrome/Puppeteer will install additional deps via --install-deps when needed
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     ca-certificates \
+    dbus \
+    dbus-x11 \
     fonts-liberation \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-thai-tlwg \
+    fonts-khmeros \
+    fonts-kacst \
+    fonts-freefont-ttf \
     git \
-    libayatana-appindicator3-1 \
-    libasound2t64 \
+    libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
-    libc6 \
+    libatspi2.0-0 \
     libcairo2 \
     libcups2 \
     libdbus-1-3 \
+    libdrm2 \
     libexpat1 \
     libfontconfig1 \
     libgbm1 \
-    libgcc-s1 \
+    libgdk-pixbuf2.0-0 \
     libglib2.0-0 \
     libgtk-3-0 \
     libnspr4 \
     libnss3 \
-    libpango-1-0-0 \
-    libpangocairo-1-0-0 \
-    libstdc++6 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libvulkan1 \
     libx11-6 \
     libx11-xcb1 \
     libxcb1 \
@@ -33,20 +49,15 @@ RUN apt-get update -y && apt-get install -yq --no-install-recommends \
     libxext6 \
     libxfixes3 \
     libxi6 \
+    libxkbcommon0 \
     libxrandr2 \
     libxrender1 \
     libxss1 \
     libxtst6 \
     wget \
     xdg-utils \
-    # Optional but highly recommended tool for unzipping Chrome binaries safely
-    unzip \
+    zlib1g \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# (Optional) Puppeteer optimization flags
-# Tells Puppeteer to download Chrome into a predictable global path if needed,
-# or skips it if you prefer downloading it locally inside node_modules.
-# ENV PUPPETEER_CACHE_DIR=/home/node/.cache/puppeteer
 
 USER node
