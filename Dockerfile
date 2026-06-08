@@ -24,6 +24,7 @@ RUN apt-get update \
     wget \
     curl \
     gnupg \
+    less \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -62,21 +63,18 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install AWS CLI v2 (required by CircleCI aws-cli orb when running as non-root)
+# Install AWS CLI v2 (optional - CircleCI orb can install it, but pre-installing saves time)
 RUN ARCH=$(uname -m) && \
     curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "/tmp/awscliv2.zip" && \
     unzip -q /tmp/awscliv2.zip -d /tmp && \
     /tmp/aws/install && \
     rm -rf /tmp/awscliv2.zip /tmp/aws
 
-# Create common working directories with proper permissions
-# /usr/src/app for general use, /data for CircleCI
-RUN mkdir -p /usr/src/app /data && \
-    chown -R node:node /usr/src/app /data
-
-USER node
+# Create common working directories
+# Running as root, so no ownership changes needed
+RUN mkdir -p /usr/src/app /data
 
 WORKDIR /usr/src/app
 
-# (Optional) Ensure Puppeteer downloads Chrome to a predictable writeable location
-ENV PUPPETEER_CACHE_DIR=/home/node/.cache/puppeteer
+# Note: Container runs as root (default) for CircleCI compatibility
+# This allows orbs and runtime package installation to work without permission issues
