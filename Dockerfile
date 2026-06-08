@@ -63,6 +63,13 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Chrome for Puppeteer
+# Using the @puppeteer/browsers package to install Chrome for Testing
+RUN npx --yes @puppeteer/browsers install chrome@stable --path /opt/chrome && \
+    # Create a stable symlink to the Chrome binary
+    CHROME_PATH=$(find /opt/chrome/chrome/linux-*/chrome-linux*/chrome -type f 2>/dev/null | head -1) && \
+    ln -sf "$CHROME_PATH" /usr/local/bin/chrome
+
 # Install AWS CLI v2 (optional - CircleCI orb can install it, but pre-installing saves time)
 RUN ARCH=$(uname -m) && \
     curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "/tmp/awscliv2.zip" && \
@@ -75,6 +82,10 @@ RUN ARCH=$(uname -m) && \
 RUN mkdir -p /usr/src/app /data
 
 WORKDIR /usr/src/app
+
+# Configure Puppeteer to use the installed Chrome
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/local/bin/chrome
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Note: Container runs as root (default) for CircleCI compatibility
 # This allows orbs and runtime package installation to work without permission issues
