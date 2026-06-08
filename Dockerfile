@@ -66,8 +66,8 @@ RUN apt-get update \
 # Install Chrome for Puppeteer
 # Using the @puppeteer/browsers package to install Chrome for Testing
 RUN npx --yes @puppeteer/browsers install chrome@stable --path /opt/chrome && \
-    # Create a stable symlink to the Chrome binary
-    CHROME_PATH=$(find /opt/chrome/chrome/linux-*/chrome-linux*/chrome -type f 2>/dev/null | head -1) && \
+    # Create a stable symlink to the Chrome binary (find pattern needs wildcards for both linux- and linux_arm- patterns)
+    CHROME_PATH=$(find /opt/chrome/chrome -name chrome -type f 2>/dev/null | head -1) && \
     ln -sf "$CHROME_PATH" /usr/local/bin/chrome
 
 # Install AWS CLI v2 (optional - CircleCI orb can install it, but pre-installing saves time)
